@@ -16,8 +16,9 @@ sessionsArray.push({
 });
 
 const listeningPort = 8888;
-const dbUrl = "mongodb://localhost:27017";
-const dbName = "pai";
+//const dbUrl = "mongodb://localhost:27017";
+const dbUrl = "mongodb+srv://Cluster0_rw:Cluster0_rw@cluster0-hzyea.mongodb.net/admin?retryWrites=true";
+const dbName = "PAI";
 
 var server = null;
 var db = null;
