@@ -1,0 +1,31 @@
+<div id="editPerson" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Edit a person</h4>
+			</div>
+			<form name="editForm" class="ng-pristine ng-untouched ng-valid" ng-submit="ctrl.editSubmit()">
+			<div class="modal-body">
+				<div class="panel panel-default">
+					<div class="panel-heading" ng-bind="ctrl.person._id ? 'Editing a person, id '+ctrl.person._id : 'New person'">
+						<span ng-hide="editForm.$valid" class="label label-warning">incomplete data</span>
+					</div>
+					<div class="form-group panel-body">
+					<label for="firstName">First name</label>
+					<input id="firstName" type="text" ng-model="ctrl.person.firstName" class="form-control" required="" placeholder="First name"/>
+					<label for="lastName">Last name</label>
+					<input id="lastName" type="text" ng-model="ctrl.person.lastName" class="form-control" required="" placeholder="Last name"/>
+					<label for="lastName">Amount</label>
+					<input id="lastName" type="number" ng-model="ctrl.person.amount" class="form-control" required="" placeholder="Amount"/>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary glyphicon glyphicon-ok" ng-disabled="editForm.$invalid"/>
+				<button type="button" class="btn btn-danger glyphicon glyphicon-trash" ng-click="ctrl.confirmRemove()" ng-disabled="!ctrl.person._id"/>
+				<button type="button" class="btn btn-default glyphicon glyphicon-remove" data-dismiss="modal"/>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>

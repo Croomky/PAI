@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html ng-app="app1">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Login</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+</head>
+
+<body ng-controller="RegisterCtrl as ctrl">
+
+<div class="container">
+
+    <div style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); text-align: center; width: 500px; max-width=80%; z-index: 10000">
+        <uib-alert class="animated" type="{{ctrl.alert.type}}" close="ctrl.closeAlert()" dismiss-on-timeout="2000" ng-if="ctrl.alert.text">{{ctrl.alert.text}}</uib-alert>
+    </div>
+
+    <div class="page-header">
+        <h1>Register</h1>
+    </div>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            Register
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <label for="username">Username:</label>
+                    <input id="username" class="form-control" ng-model="ctrl.username" ng-change="ctrl.selectChanged()" />
+                    <label for="password">Password:</label>
+                    <input id="password" type="password" class="form-control" placeholder="password" ng-model="ctrl.password">
+                    <label for="password">Confirm password:</label>
+                    <input id="password" type="password" class="form-control" placeholder="password" ng-model="ctrl.password2">
+                    <br/>
+                    <button class="btn btn-primary" ng-click="ctrl.register()">Register</button>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12 text-center">
+                    <br/>
+                    <span class="alert alert-info" ></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+        </div>
+
+    </div>
+
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angular-animate.min.js"></script>
+    <script src="/js/angular-cookies.js"></script>
+    <script src="/js/ui-bootstrap-tpls.min.js"></script>
+    <script src="/js/app1.js"></script>
+    <script src="/js/registerCtrl.js"></script>
+
+</body></html>

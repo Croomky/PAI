@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html ng-app="app1">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Groups</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+</head>
+
+<body ng-controller="GroupsCtrl as ctrl">
+
+<div class="container">
+
+    <ng-include src="'/html/confirmDialog.html'"></ng-include>
+    <!-- <ng-include src="'/html/editPerson.html'"></ng-include> -->
+
+
+    <div style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); text-align: center; width: 500px; max-width=80%; z-index: 10000">
+        <uib-alert class="animated" type="{{ctrl.alert.type}}" close="ctrl.closeAlert()" dismiss-on-timeout="2000" ng-if="ctrl.alert.text">{{ctrl.alert.text}}</uib-alert>
+    </div>
+
+    <div class="page-header">
+        <h1>Groups</h1>
+    </div>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            Enroll to groups you like!
+            
+        </div>
+
+        <div class="panel-body">
+            <table class="table table-hover">
+                <tbody>
+                    <tr><th>Group</th><th>Signed in?</th></tr>
+                    <tr ng-repeat="element in ctrl.enrolledGroups" ng-click="ctrl.groupEnrollment(element)">
+                        <td ng-bind="element" ></td>
+                        <td style="width: 10%;">X</td>
+                    </tr>
+                    <tr ng-repeat="element in ctrl.notEnrolledGroups" ng-click="ctrl.groupEnrollment(element.name)">
+                        <td ng-bind="element.name" ></td>
+                        <td style="width: 10%;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel-footer">
+            
+        </div>
+
+
+    <!-- <div class="row" style="margin: 2% 0 2% 0;">
+        <div class="col-sm-1">
+            <button class="btn btn-primary" ng-click="ctrl.edit()">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+        </div>
+        <div class="col-sm-11 form-inline" style="text-align: right;">
+            <span class="glyphicon glyphicon-search"></span>
+            <input type="text" class="form-control" ng-model="ctrl.filter" ng-change="ctrl.refreshPersons()"/>
+            <button class="btn btn-primary" ng-click="ctrl.prev()" ng-disabled="ctrl.nSkip < 10">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </button>
+            <span class="label label-default" style="display: inline-block; width: 50px;" ng-bind="ctrl.nSkip"></span>-<span class="label label-default" style="display: inline-block; width: 50px;" ng-bind="ctrl.nSkip + ctrl.nLimit - 1 >= ctrl.count ? ctrl.count - 1 : ctrl.nSkip + ctrl.nLimit - 1"></span> /
+            <span class="label label-default" style="display: inline-block; width: 50px;" ng-bind="ctrl.count"></span> of
+            <span class="label label-default" style="display: inline-block; width: 50px;" ng-bind="ctrl.countTotal"></span>
+            <button class="btn btn-primary" ng-click="ctrl.next()" ng-disabled="ctrl.nSkip + 10 >= ctrl.count">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
+        </div>
+    </div> -->
+
+</div>
+
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angular-animate.min.js"></script>
+    <script src="/js/angular-cookies.js"></script>
+    <script src="/js/ui-bootstrap-tpls.min.js"></script>
+    <script src="/js/app1.js"></script>
+    <script src="/js/groupsCtrl.js"></script>
+
+</body></html>
