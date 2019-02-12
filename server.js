@@ -10,15 +10,15 @@ var ObjectId = mongodb.ObjectId;
 
 var debugLog = true; // turning on logging to the console
 var sessionsArray = [];
-sessionsArray.push({
-    sessionID: '098f6bcd4621d373cade4e832627b4f6',
-    username: 'test'
-});
+// sessionsArray.push({
+//     sessionID: '098f6bcd4621d373cade4e832627b4f6',
+//     username: 'test'
+// });
 
 const listeningPort = 8888;
-//const dbUrl = "mongodb://localhost:27017";
-const dbUrl = "mongodb+srv://Cluster0_rw:Cluster0_rw@cluster0-hzyea.mongodb.net/admin?retryWrites=true";
-const dbName = "PAI";
+const dbUrl = "mongodb://localhost:27017";
+//const dbUrl = "mongodb+srv://Cluster0_rw:Cluster0_rw@cluster0-hzyea.mongodb.net/admin?retryWrites=true";
+const dbName = "PAI_Konrad_Pawlak";
 
 var server = null;
 var db = null;
@@ -33,25 +33,77 @@ mongo.connect(dbUrl, { useNewUrlParser: true }, function(err, conn) {
         process.exit();
 	}
 
-	console.log("Connection to database established");
+    console.log("Connection to database established");
 	
 	db = conn.db(dbName);
 	// db.dropDatabase(); // uncomment to clear database
     persons = db.collection("persons");
     groups = db.collection("groups");
     messages = db.collection("messages");
-	// persons.find().count(function(err, n) {
-	// 	if(n == 0) {
-	// 		console.log("No persons, initializing by sample data");
-	// 		try {
-    //             var examplePersons = JSON.parse(fs.readFileSync("persons.json", 'utf8'));
-    //             persons.insertMany(examplePersons);
-    //         } catch(ex) {
-	// 			console.log("Error during initialization");
-	// 			process.exit();
-	// 		}
-	// 	}
-	// });
+
+    groups.findOne({
+        name: "test group"
+    }).then(function (doc) {
+        if(doc == null) {
+            groups.insertOne({
+                name: 'test group',
+                users: ["test"]
+            });
+        }
+    })
+
+    groups.findOne({
+        name: "test group2"
+    }).then(function (doc) {
+        if(doc == null) {
+            groups.insertOne({
+                name: 'test group2',
+                users: ["test"]
+            });
+        }
+    })
+    
+    messages.find().count(function(err, n) {
+        if(n == 0) {
+            try {
+                var messagesFile = JSON.parse(fs.readFileSync("messages.json", 'utf8'));
+                messages.insertMany(messagesFile, function(err) {
+                    persons.findOne({
+                        login: 'test'
+                    }).then(function(doc) {
+                        if(doc == null) {
+                            try {
+                                messages.find({}, {
+                                    projection: {
+                                        _id: 1
+                                    }
+                                }).toArray(function(err, docs) {
+                                    messagesArray = []
+                                    docs.forEach(doc => {
+                                        messagesArray.push(doc._id);
+                                    });
+                
+                                    persons.insertOne({
+                                        login: 'test',
+                                        password: md5('qwe'),
+                                        messages: messagesArray
+                                    });
+                                })
+                            } catch(ex) {
+                                console.log("Error during initialization");
+                                process.exit();
+                            }
+                        }
+                    }).catch(function(err) {
+                        console.log("Error: " + err);
+                    })
+                });
+            } catch(ex) {
+                console.log("Error during initialization");
+                process.exit();
+            }
+        }
+    });
 	
 	try {
 		server.listen(listeningPort);
@@ -101,7 +153,6 @@ function saveSessionCookie(username) {
 }
 
 function getUsernameBySessionID(sessionID) {
-    //console.log(sessionsArray);
     let username;
     sessionsArray.forEach(element => {
         if(element.sessionID == sessionID) {
@@ -115,11 +166,6 @@ function getUsernameBySessionID(sessionID) {
 function isUserEnrolledToGroup(groupName, username) {
     return new Promise(function(resolve, reject) {
         groups.findOne({ name: groupName }).then(function(doc) {
-            // if(err) {
-            //     console.log("Couldn't fetch group by group name: " + err);
-            //     return;
-            // }
-            //console.log(username);
             if(!doc) {
                 console.log("Couldn't find " + groupName);
                 reject();
@@ -132,12 +178,6 @@ function isUserEnrolledToGroup(groupName, username) {
                 resolve(false);
             }
         });
-    });
-}
-
-function authenticateOverSessionID(userSessionId) {
-    return new Promise(function(resolve, reject) {
-        
     });
 }
 
@@ -165,7 +205,7 @@ server = http.createServer().on('request', function (req, rep) {
                             obj = JSON.parse(content);
                             persons.insertOne({
                                 login: obj.login,
-                                password: obj.password,
+                                password: md5(obj.password),
                                 messages: []
                             }, function (err, insResult) {
                                 if (err) {
@@ -195,7 +235,10 @@ server = http.createServer().on('request', function (req, rep) {
                     var obj = {};
                     try {
                         obj = JSON.parse(content);
-                        persons.findOne(obj, function (err, doc) {
+                        persons.findOne({
+                            login: obj.login,
+                            password: md5(obj.password)
+                        }, function (err, doc) {
                             if (err) {
                                 serverErrorJson(rep, 406, "Find failed");
                                 return;
@@ -315,7 +358,6 @@ server = http.createServer().on('request', function (req, rep) {
 
                             var groupsArray = [];
                             docs.forEach(group => {
-                                //console.log(group);
                                 group.users.forEach(user => {
                                     if(user == username) {
                                         groupsArray.push(group.name);
@@ -323,7 +365,6 @@ server = http.createServer().on('request', function (req, rep) {
                                 });
                             });
                             
-                            //console.log("groupsArray: " + groupsArray);
                             rep.writeHead(200, {"Content-type": "application/json"});
                             rep.end(JSON.stringify({ groupsArray }));
                         });
@@ -361,10 +402,6 @@ server = http.createServer().on('request', function (req, rep) {
                                 groups.findOne({
                                     name: obj.group
                                 }).then(function(docs) {
-                                    // if(err) {
-                                    //     serveErrorJson(rep, 406, "Invalid JSON");
-                                    // }
-        
                                     docs.users.forEach(user => {
                                         persons.findOneAndUpdate({
                                             login: user
@@ -410,7 +447,6 @@ server = http.createServer().on('request', function (req, rep) {
                         login: username
                     }).then(function(res) {
                         rep.writeHead(200, {"Content-type": "application/json"});
-                        //console.log("res.messages.length")
                         rep.end(JSON.stringify({ answer: res.messages.length }));
                     }).catch(function(err) {
                         serveErrorJson(rep, 405, "Cannot count messages");
@@ -420,38 +456,35 @@ server = http.createServer().on('request', function (req, rep) {
                     return;
                 }
             });
+            break;
+        case '/logOut':
+            if(req.method != "POST") {
+                serveErrorJson(rep, 405, "Method " + req.method + " not allowed");
+            }
 
-            // if(req.method == "POST") {
-            //     var content = "";
-            //     req.setEncoding("utf8");
-            //     req.on("data", function (data) {
-            //         content += data;
-            //     }).on("end", function () {
-            //         var obj = {};
-            //         try {
-            //             obj = JSON.parse(content);
-            //             let username = getUsernameBySessionID(obj.sessionID);
-            //             persons.find({
-            //                 login: username
-            //             }).then(function(res) {
-            //                 rep.writeHead(200, {"Content-type": "application/json"});
-            //                 //console.log("res.messages.length")
-            //                 rep.end(JSON.stringify({ answer: res.messages.length }));
-            //             }).catch(function(rep) {
-            //                 serveErrorJson(rep, 405, "Cannot count messages");
-            //             });
-            //             // rep.writeHead(200, {"Content-type": "application/json"});
-            //             // //console.log("res.messages.length")
-            //             // rep.end(JSON.stringify({ answer: res.messages.length }));
-            //         } catch (ex) {
-            //             serveErrorJson(ex, 406, "Invalid JSON");
-            //             return;
-            //         }
-            //     });
-            // } else {
-            //     serveErrorJson(rep, 405, "Method " + req.method + " not allowed");
-            // }
+            var content = "";
+            req.setEncoding("utf8");
+            req.on("data", function (data) {
+                content += data;
+            }).on("end", function () {
+                var obj = {};
+                try {
+                    obj = JSON.parse(content);
+                    console.log("obj:" + obj)
+                    let i = sessionsArray.indexOf({
+                        sessionID: obj.sessionID,
+                        username: getUsernameBySessionID(obj.sessionID)
+                    });
 
+                    sessionsArray.splice(i, 1);
+                    rep.writeHead(200, {"Content-type": "application/json"});
+                    rep.end();
+                } catch (ex) {
+                    console.log("ex: " + ex)
+                    serveErrorJson(rep, 406, "Invalid JSON");
+                    return;
+                }
+            });
             break;
         default:
             if (/^\/(html|css|js|fonts|img)\//.test(req.url)) {
@@ -508,116 +541,7 @@ server = http.createServer().on('request', function (req, rep) {
                 })
                 break;
 
-            } else if (/\/person\//.test(req.url)) {
-
-                var a = req.url.split("/");
-                var id;
-                try {
-                    id = ObjectId(a[2]);
-                } catch (ex) {
-                    serveErrorJson(rep, 406, "Invalid id " + a[2]);
-                    return;
-                }
-
-                switch (req.method) {
-
-                    case "GET":
-                        persons.findOne({_id: id}, function (err, doc) {
-                            if (err || !doc) {
-                                serveErrorJson(rep, 404, "Object " + a[2] + " not found");
-                                return;
-                            }
-                            rep.writeHead(200, {"Content-type": "application/json"});
-                            rep.end(JSON.stringify(doc));
-                        });
-                        break;
-
-                    case "DELETE":
-                        persons.findOneAndDelete({_id: id}, function (err) {
-                            if (err) {
-                                serveErrorJson(rep, 405, "Delete failed");
-                                return;
-                            }
-                            rep.writeHead(200, {"Content-type": "application/json"});
-                            rep.end(JSON.stringify({}));
-                        });
-                        break;
-
-					case "PUT":
-                        var content = "";
-                        req.setEncoding("utf8");
-                        req.on("data", function (data) {
-                            content += data;
-                        }).on("end", function () {
-                            var obj = {};
-                            try {
-                                obj = JSON.parse(content);
-                                if (!("firstName" in obj && "lastName" in obj)) {
-                                    serveErrorJson(rep, 406, "Invalid data");
-                                    return;
-                                }
-                            } catch (ex) {
-                                serveErrorJson(rep, 406, "Invalid JSON");
-                                return;
-                            }
-                            persons.findOneAndUpdate({_id: id}, {$set: obj}, {returnOriginal: false}, function (err, updStatus) {
-                                if (updStatus.ok) {
-                                    rep.writeHead(200, {"Content-type": "application/json"});
-                                    rep.end(JSON.stringify(updStatus.value));
-                                } else {
-                                    serverErrorJson(rep, 406, "Update failed");
-                                }
-                            });
-                        });
-                        break;
-
-                    default:
-                        serveErrorJson(rep, 405, "Method " + req.method + " not allowed");
-                }
-
-            } else if (/\/transfer\//.test(req.url)) {
-
-                var a = req.url.split("/");
-                var id;
-                try {
-                    id = ObjectId(a[2]);
-                } catch (ex) {
-                    serveErrorJson(rep, 406, "Invalid id " + a[2]);
-                    return;
-                }
-
-                switch (req.method) {
-                    case "POST":
-                        var content = "";
-                        req.setEncoding("utf8");
-                        req.on("data", function (data) {
-                            content += data;
-                        }).on("end", function () {
-                            var obj = {};
-                            try {
-                                obj = JSON.parse(content);
-                                if (!("amount" in obj) || typeof (obj.amount) != "number") {
-                                    serveErrorJson(rep, 406, "Invalid data");
-                                    return;
-                                }
-                            } catch (ex) {
-                                serveErrorJson(rep, 406, "Invalid JSON");
-                                return;
-                            }
-                            persons.findOneAndUpdate({_id: id}, {$inc: {amount: obj.amount}}, {returnOriginal: false}, function (err, updStatus) {
-                                if (updStatus.ok) {
-                                    rep.writeHead(200, {"Content-type": "application/json"});
-                                    rep.end(JSON.stringify(updStatus.value));
-                                } else {
-                                    serverErrorJson(rep, 406, "Update failed");
-                                }
-                            });
-                        });
-                        break;
-                    default:
-                        serveErrorJson(rep, 405, "Method " + req.method + " not allowed");
-                }
-    		} else if(/\/username\//.test(req.url)) {
+            } else if(/\/username\//.test(req.url)) {
                 let username = req.url.split('/')[2];
                 persons.findOne({ login: username }, function(err, doc) {
                     if(doc) {
@@ -661,7 +585,7 @@ server = http.createServer().on('request', function (req, rep) {
                                 serveErrorJson(rep, 404, "Messages not found");
                                 return;
                             }
-                            console.log("docs: " + docs[0].messages);
+                            //console.log("docs: " + docs[0].messages);
                             messages.find({
                                 _id: { $in: docs[0].messages }
                             }).skip(skip).limit(limit).toArray(function(err, msgArray) {

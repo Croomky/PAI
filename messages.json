@@ -1,0 +1,38 @@
+[
+    {
+      "title": "Hello",
+      "author": "test",
+      "body": "Hello everyone!",
+      "group": "test group"
+    },
+    {
+      "title": "Hi!",
+      "author": "test",
+      "body": "Hi everyone!",
+      "group": "test group"
+    },
+    {
+      "title": "My message",
+      "author": "test",
+      "body": "This is my message.",
+      "group": "test group"
+    },
+    {
+      "title": "Another message",
+      "author": "test",
+      "body": "Another message",
+      "group": "test group"
+    },
+    {
+      "title": "Meeting",
+      "author": "test",
+      "body": "Meeting at 9.",
+      "group": "test group"
+    },
+    {
+      "title": "Always look on the bright side of life.",
+      "author": "test",
+      "body": "Always look on the bright side of life.",
+      "group": "test group"
+    }
+  ]

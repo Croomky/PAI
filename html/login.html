@@ -37,16 +37,14 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-12">
-                    <label for="username">Username:</label>
-                    <input id="username" class="form-control" ng-model="ctrl.username" ng-change="ctrl.selectChanged()" />
-                    <label for="password">Password:</label>
-                    <input id="password" type="password" class="form-control" placeholder="password" ng-model="ctrl.password">
-                    <br/>
-                    <button class="btn btn-primary" ng-click="ctrl.login()">Login</button>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12 text-center">
-                    <br/>
-                    <span class="alert alert-info" ></span>
+                    <form>
+                        <label for="username">Username:</label>
+                        <input id="username" class="form-control" ng-model="ctrl.username" ng-change="ctrl.selectChanged()" />
+                        <label for="password">Password:</label>
+                        <input id="password" type="password" class="form-control" placeholder="password" ng-model="ctrl.password">
+                        <br/>
+                        <button class="btn btn-primary" ng-click="ctrl.login()">Login</button>
+                    </form>
                 </div>
             </div>
         </div>

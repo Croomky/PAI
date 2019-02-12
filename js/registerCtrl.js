@@ -54,11 +54,11 @@ app.controller("RegisterCtrl", [ "$cookieStore", "$http", function($cookieStore,
     ctrl.checkForEmptyFields = function() {
         let foundEmpty = false;
         if(ctrl.username == "") {
-            ctrl.alert.text += "\nUsername cannot be empty";
+            ctrl.alert.text += "Username cannot be empty. ";
             foundEmpty = true;
         }
         if(ctrl.password == "") {
-            ctrl.alert.text += "\nPassword cannot be empty";
+            ctrl.alert.text += "Password cannot be empty. ";
             foundEmpty = true;
         }
 

@@ -34,7 +34,8 @@
 				</div>
 				<div ng-if="ctrl.isAuthenticated == true">
 					<a href="/html/groups.html" class="btn btn-default btn-sm">Groups</a>
-					<a href="/html/message.html" class="btn btn-default btn-sm">Create Message</a>	
+					<a href="/html/message.html" class="btn btn-default btn-sm">Create Message</a>
+					<button class="btn btn-default btn-sm" ng-click="ctrl.logOut()">Log out</button>	
 				</div>
 				
 			</div>

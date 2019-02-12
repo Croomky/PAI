@@ -39,7 +39,7 @@ app.controller("IndexCtrl", [ "$cookieStore", "$http", function($cookieStore, $h
             $http.post('/authenticate', {
                 sessionID: sessionID
             }).then(function(res) {
-                console.log(res.data.answer);
+                //console.log(res.data.answer);
                 if(res.data.answer == true) {
                     ctrl.isAuthenticated = true;
                 }
@@ -50,7 +50,7 @@ app.controller("IndexCtrl", [ "$cookieStore", "$http", function($cookieStore, $h
 
     ctrl.getNumberOfMessages = function() {
         let sessionID = ctrl.getSessionIdFromCookie();
-        console.log(sessionID);
+        //console.log(sessionID);
         $http.post('/getNumberOfMessages', {
             sessionID: sessionID
         }).then(function(res) {
@@ -70,6 +70,18 @@ app.controller("IndexCtrl", [ "$cookieStore", "$http", function($cookieStore, $h
         ctrl.nSkip -= 5;
         ctrl.nLimit -= 5;
         ctrl.getMessages();
+    }
+
+    ctrl.logOut = function() {
+        console.log("sessionID: " + ctrl.getSessionIdFromCookie())
+        $http.post('/logOut', {
+            sessionID: ctrl.getSessionIdFromCookie()
+        }).then(function(res) {
+            $cookieStore.remove('sessionID');
+            window.open('/', '_self');
+        }).catch(function(err) {
+            console.log("Couldn't log out with error: " + err);
+        });
     }
 
     ctrl.authenticate().then(function(res) {
